@@ -58,15 +58,7 @@ name: internal-win10
 
 # The tags of the shipper are included in their own field with each
 # transaction published.
-tags: ["T1110_vertical_brute_force"]
-
-# Optional fields that you can specify to add additional information to the
-# output.
-fields:
-env: SJ-Lab
-pipeline: ad
-tactic: credential_access
-technique: vertical_brute_force
+tags: ["SJ-Lab", "AD", "T1110_vertical_brute_force"]
 
 #================================ Outputs =====================================
 # Configure what outputs to use when sending the data collected by the beat.
