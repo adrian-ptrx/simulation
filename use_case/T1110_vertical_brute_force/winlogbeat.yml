@@ -1,17 +1,8 @@
-###################### Winlogbeat Configuration Example ##########################
-
-# This file is an example configuration file highlighting only the most common
-# options. The winlogbeat.full.yml file from the same directory contains all the
-# supported options with more comments. You can use it as a reference.
-#
+###################### Winlogbeat Configuration ##########################
 # You can find the full configuration reference here:
 # https://www.elastic.co/guide/en/beats/winlogbeat/index.html
 
-# where Winlogbeat stores information that it uses to resume monitoring after a restart. 
-winlogbeat.registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
-
 #======================= Winlogbeat specific options ==========================
-
 # event_logs specifies a list of event logs to monitor as well as any
 # accompanying options. The YAML data type of event_logs is a list of
 # dictionaries.
@@ -23,12 +14,12 @@ winlogbeat.registry_file: C:/ProgramData/winlogbeat/.winlogbeat.yml
 
 winlogbeat.event_logs:
   - name: Application
-    ignore_older: 72h
+    ignore_older: 2h
   - name: Security
-    ignore_older: 72h
+    ignore_older: 2h
     include_xml: true
   - name: System
-    ignore_older: 72h
+    ignore_older: 2h
 
 processors:
   - drop_event.when.or:
@@ -59,67 +50,52 @@ processors:
   - drop_event.when.and:
     - equals.event_id: 4624
     - contains.event_data.TargetUserName: "RemoteControlGateway" # Drop Service Account Logons
-#================================ General =====================================
 
+#================================ General =====================================
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
 name: internal-win10
 
 # The tags of the shipper are included in their own field with each
 # transaction published.
-tags: ["ad", "vertical_brute_force"]
+tags: ["T1110_vertical_brute_force"]
 
 # Optional fields that you can specify to add additional information to the
 # output.
-#fields:
+fields:
 env: SJ-Lab
+pipeline: ad
+tactic: credential_access
+technique: vertical_brute_force
 
 #================================ Outputs =====================================
-
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
 
-#-------------------------- Elasticsearch output ------------------------------
-#output.elasticsearch:
-  # Array of hosts to connect to.
-  #hosts: ["elasticsearch:9200"]
-
-  # Optional protocol and basic auth credentials.
-  #protocol: "https"
-  #username: "elastic"
-  #password: "changeme"
-
-#----------------------------- Logstash output --------------------------------
-#output.logstash:
-  # The Logstash hosts
-  #hosts: ["10.10.10.4:5044"]
-  #loadbalance: true
-
-  # Optional SSL. By default is off.
-  # List of root certificates for HTTPS server verifications
-  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-
-  # Certificate for SSL client authentication
-  #ssl.certificate: "/etc/pki/client/cert.pem"
-
-  # Client Certificate Key
-  #ssl.key: "/etc/pki/client/cert.key"
-
 #----------------------------- File output --------------------------------
 output.file:
-  #path: "/tmp/winlogbeat"
-  path: "/Program Files/winlogbeat/logs"
+  path: "/tmp/winlogbeat/output"
   filename: winlogbeat.json
   rotate_every_kb: 10000
-  number_of_files: 7
-  #permissions: 0600
-#================================ Logging =====================================
+  number_of_files: 10
+  permissions: 0644
 
-# Sets log level. The default log level is info.
-# Available log levels are: critical, error, warning, info, debug
-#logging.level: debug
+
+#================================ Logging =====================================
+logging.level: debug
+logging.to_files: true
+logging.files:
+  path: C:\ProgramData\winlogbeat\logs
+  name: winlogbeat.log
+  keepfiles: 7
+  permissions: 0600 
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
 # "publish", "service".
 #logging.selectors: ["*"]
+
+
+#================================ Status Tracking =====================================
+# where Winlogbeat stores information that it uses to resume monitoring after a restart. 
+winlogbeat.registry_file: C:\ProgramData\winlogbeat\.winlogbeat.yml
